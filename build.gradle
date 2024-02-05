@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.4'
+    id 'io.spring.dependency-management' version '1.1.3'
+}
+
+group = 'com.bot.weather.vk'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation group: 'com.vk.api', name: 'sdk', version: '1.0.14'
+    testImplementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.26'
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-transcoder', version: '1.14'
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-codec', version: '1.14'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
