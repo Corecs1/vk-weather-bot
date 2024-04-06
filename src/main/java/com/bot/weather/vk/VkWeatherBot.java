@@ -9,16 +9,16 @@ import org.springframework.context.annotation.Primary;
 import java.io.IOException;
 import java.util.Properties;
 
-@SpringBootApplication
 @Slf4j
+@SpringBootApplication
 public class VkWeatherBot {
 
     public static void main(String[] args) {
         SpringApplication.run(VkWeatherBot.class, args);
     }
 
-    @Bean("propertiesBean")
     @Primary
+    @Bean("propertiesBean")
     protected Properties properties() {
         Properties properties = new Properties();
 

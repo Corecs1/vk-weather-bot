@@ -9,18 +9,13 @@ import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.queries.groups.GroupsGetLongPollServerQuery;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
 @Data
-@RequiredArgsConstructor
 @Slf4j
-@DependsOn("propertiesBean")
 @Component(VkConfig.NAME)
 public class VkConfig {
     public static final String NAME = "vk_config";
@@ -28,8 +23,7 @@ public class VkConfig {
     public static GroupActor actor;
     private static final String API_VERSION = "5.199";
     private static int ts;
-    @Autowired
-    private Properties properties;
+    private final Properties properties;
 
     // TODO Aspect
     @PostConstruct

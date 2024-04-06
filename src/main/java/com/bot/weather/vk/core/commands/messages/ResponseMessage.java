@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class ResponseMessage {
-    private Message message;
+    private final Message message;
     private final List<GetResponse> userInfo;
 
     public ResponseMessage(Message message) throws ClientException, ApiException {
@@ -37,7 +37,7 @@ public abstract class ResponseMessage {
 
     public abstract void sendMessage() throws ClientException, ApiException;
 
-    void sendMessagePattern(String text) throws ClientException, ApiException {
+    protected void sendMessagePattern(String text) throws ClientException, ApiException {
         Random random = new Random();
         VkConfig.getVk().messages()
                 .send(VkConfig.getActor())
@@ -47,20 +47,36 @@ public abstract class ResponseMessage {
                 .execute();
     }
 
-    void sendPicturePattern(File picture) throws ClientException, ApiException {
+    protected void sendPicturePattern(File picture) throws ClientException, ApiException {
         Random random = new Random();
-        GetMessagesUploadServerResponse uploadServerResponse = VkConfig.getVk().photos().getMessagesUploadServer(VkConfig.getActor()).execute();
-        MessageUploadResponse messageUploadResponse = VkConfig.getVk().upload().photoMessage(uploadServerResponse.getUploadUrl().toString(), picture).execute();
+
+        GetMessagesUploadServerResponse uploadServerResponse = VkConfig.getVk()
+                .photos()
+                .getMessagesUploadServer(VkConfig.getActor())
+                .execute();
+        MessageUploadResponse messageUploadResponse = VkConfig.getVk()
+                .upload()
+                .photoMessage(uploadServerResponse.getUploadUrl().toString(), picture)
+                .execute();
+
         picture.delete();
-        List<SaveMessagesPhotoResponse> photoList = VkConfig
-                .getVk()
+
+        List<SaveMessagesPhotoResponse> photoList = VkConfig.getVk()
                 .photos()
                 .saveMessagesPhoto(VkConfig.getActor(), messageUploadResponse.getPhoto())
                 .server(messageUploadResponse.getServer())
                 .hash(messageUploadResponse.getHash())
                 .execute();
+
         SaveMessagesPhotoResponse photo = photoList.get(0);
         String attachment = "photo" + photo.getOwnerId() + "_" + photo.getId() + "_" + photo.getAccessKey();
-        VkConfig.getVk().messages().send(VkConfig.getActor()).attachment(attachment).userId(getMessage().getFromId()).randomId(random.nextInt(1000)).execute();
+
+        VkConfig.getVk()
+                .messages()
+                .send(VkConfig.getActor())
+                .attachment(attachment)
+                .userId(getMessage().getFromId())
+                .randomId(random.nextInt(1000))
+                .execute();
     }
 }

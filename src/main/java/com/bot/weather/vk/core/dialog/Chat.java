@@ -40,9 +40,7 @@ public class Chat extends GroupLongPollApi {
         if (message.getType() == Events.MESSAGE_NEW) {
             try {
                 messageObjectNew(message.getGroupId(), gson.fromJson(message.getObject(), MessageObject.class));
-            } catch (ClientException e) {
-                throw new RuntimeException(e);
-            } catch (ApiException e) {
+            } catch (ClientException | ApiException e) {
                 throw new RuntimeException(e);
             }
             return "OK";
@@ -78,14 +76,13 @@ public class Chat extends GroupLongPollApi {
         List<GetResponse> userInfo = null;
 
         try {
-            userInfo = VkConfig.getVk().users()
+            userInfo = VkConfig.getVk()
+                    .users()
                     .get(VkConfig.getActor())
                     .userIds(String.valueOf(message.getFromId()))
                     .fields(Fields.CITY)
                     .execute();
-        } catch (ApiException e) {
-            throw new RuntimeException(e);
-        } catch (ClientException e) {
+        } catch (ApiException | ClientException e) {
             throw new RuntimeException(e);
         }
 

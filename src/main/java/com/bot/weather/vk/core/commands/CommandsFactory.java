@@ -13,29 +13,14 @@ public class CommandsFactory {
     }
 
     public ResponseMessage getMessage(MessageTypes type) throws ClientException, ApiException {
-        ResponseMessage toReturn;
-        switch (type) {
-            case HELLO:
-                toReturn = new HelloMessage(message);
-                break;
-            case BUTTONS:
-                toReturn = new ButtonsMessage(message);
-                break;
-            case CITY_WEATHER:
-                toReturn = new CityWeatherMessage(message);
-                break;
-            case USER_CITY_WEATHER:
-                toReturn = new UserCityWeatherMessage(message);
-                break;
-            case UNKNOWN:
-                toReturn = new UnknownMessage(message);
-                break;
-            case INFO:
-                toReturn = new InfoMessage(message);
-                break;
-            default:
-                throw new IllegalArgumentException("Wrong message type " + type);
-        }
-        return toReturn;
+        return switch (type) {
+            case HELLO -> new HelloMessage(message);
+            case BUTTONS -> new ButtonsMessage(message);
+            case CITY_WEATHER -> new CityWeatherMessage(message);
+            case USER_CITY_WEATHER -> new UserCityWeatherMessage(message);
+            case UNKNOWN -> new UnknownMessage(message);
+            case INFO -> new InfoMessage(message);
+            default -> throw new IllegalArgumentException("Wrong message type " + type);
+        };
     }
 }
