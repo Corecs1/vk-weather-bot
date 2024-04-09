@@ -13,13 +13,21 @@ import java.io.*;
 import java.util.Objects;
 
 public class WeatherPicture {
+
     private final String temp;
+
     private final String city;
+
     private final String country;
+
     private final String description;
+
     private final String wind;
+
     private final String pressure;
+
     private final String humidity;
+
     private final String weatherCondition;
 
     public WeatherPicture(String temp, String city, String country, String description, String wind, String pressure, String humidity, String weatherCondition) {

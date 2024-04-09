@@ -5,58 +5,47 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.httpclient.HttpTransportClient;
-import com.vk.api.sdk.queries.groups.GroupsGetLongPollServerQuery;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 @Data
-@Slf4j
-@Component(VkConfig.NAME)
+@Configuration(VkConfig.NAME)
 public class VkConfig {
+
     public static final String NAME = "vk_config";
-    public static VkApiClient vk;
-    public static GroupActor actor;
-    private static final String API_VERSION = "5.199";
-    private static int ts;
-    private final Properties properties;
 
-    // TODO Aspect
+    @Value("${api_version}")
+    private String API_VERSION;
+
+    private VkApiClient vkApiClient;
+
+    private GroupActor groupActor;
+
+    @Autowired
+    public VkConfig(VkApiClient vkApiClient, GroupActor groupActor) {
+        this.vkApiClient = vkApiClient;
+        this.groupActor = groupActor;
+    }
+
     @PostConstruct
-    private void loadConfigs() throws ClientException, ApiException {
-        log.info("Starting load configs...");
+    private void runChat() throws ClientException, ApiException {
+        setupVkClient();
+        new Chat(vkApiClient, groupActor, 25).run();
+    }
 
-        int groupId = Integer.parseInt(properties.getProperty("group_id"));
-        String pictureAccessToken = properties.getProperty("picture_access_token");
-
-        vk = new VkApiClient(HttpTransportClient.getInstance());
-        actor = new GroupActor(groupId, pictureAccessToken);
-
-        GroupsGetLongPollServerQuery longPollServer = vk.groups().getLongPollServer(actor, groupId);
-
-        vk.groups().setLongPollSettings(actor, groupId)
+    private void setupVkClient() throws ClientException, ApiException {
+        vkApiClient.groups().setLongPollSettings(groupActor, groupActor.getGroupId())
                 .apiVersion(API_VERSION)
                 .enabled(true)
                 .messageNew(true)
                 .photoNew(true)
                 .execute();
-        vk.groupsLongPoll().getLongPollServer(actor, groupId).execute();
-        ts = vk.messages().getLongPollServer(actor).execute().getTs();
 
-        log.info("Configs is load successfully...");
-
-        new Chat(vk, actor, 25).run();
-    }
-
-    public static VkApiClient getVk() {
-        return vk;
-    }
-
-    public static GroupActor getActor() {
-        return actor;
+        vkApiClient.groupsLongPoll()
+                .getLongPollServer(groupActor, groupActor.getGroupId())
+                .execute();
     }
 }

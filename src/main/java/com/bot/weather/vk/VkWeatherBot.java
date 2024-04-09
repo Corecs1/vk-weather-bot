@@ -1,35 +1,36 @@
 package com.bot.weather.vk;
 
-import lombok.extern.slf4j.Slf4j;
+import com.bot.weather.vk.global.config.VkConfig;
+import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.client.actors.GroupActor;
+import com.vk.api.sdk.httpclient.HttpTransportClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Import;
 
-import java.io.IOException;
-import java.util.Properties;
-
-@Slf4j
 @SpringBootApplication
+@Import(VkConfig.class)
 public class VkWeatherBot {
+
+    @Value("${picture_access_token}")
+    private String pictureAccessToken;
+
+    @Value("#{new Integer('${group_id}')}")
+    private Integer groupId;
 
     public static void main(String[] args) {
         SpringApplication.run(VkWeatherBot.class, args);
     }
 
-    @Primary
-    @Bean("propertiesBean")
-    protected Properties properties() {
-        Properties properties = new Properties();
+    @Bean
+    public GroupActor groupActor() {
+        return new GroupActor(groupId, pictureAccessToken);
+    }
 
-        try {
-            properties.load(this.getClass().getResourceAsStream("/vkconfig.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("Ошибка при загрузке файла конфигурации");
-            throw new RuntimeException(e);
-        }
-
-        return properties;
+    @Bean
+    public VkApiClient vkApiClient() {
+        return new VkApiClient(HttpTransportClient.getInstance());
     }
 }

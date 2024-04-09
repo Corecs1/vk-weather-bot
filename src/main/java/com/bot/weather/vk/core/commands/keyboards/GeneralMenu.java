@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GeneralMenu implements Menu {
+
     private final Keyboard keyboard = new Keyboard();
 
     @Override

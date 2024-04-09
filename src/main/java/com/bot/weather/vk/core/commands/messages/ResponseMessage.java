@@ -1,6 +1,8 @@
 package com.bot.weather.vk.core.commands.messages;
 
-import com.bot.weather.vk.global.config.VkConfig;
+import com.bot.weather.vk.global.config.SpringContext;
+import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.messages.Message;
@@ -15,13 +17,21 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class ResponseMessage {
+
+    protected final VkApiClient vkApiClient;
+
+    protected final GroupActor groupActor;
+
     private final Message message;
+
     private final List<GetResponse> userInfo;
 
     public ResponseMessage(Message message) throws ClientException, ApiException {
+        this.vkApiClient = SpringContext.getBean(VkApiClient.class);
+        this.groupActor = SpringContext.getBean(GroupActor.class);
         this.message = message;
-        this.userInfo = VkConfig.getVk().users()
-                .get(VkConfig.getActor())
+        this.userInfo = vkApiClient.users()
+                .get(groupActor)
                 .userIds(String.valueOf(message.getFromId()))
                 .fields(Fields.CITY)
                 .execute();
@@ -39,8 +49,8 @@ public abstract class ResponseMessage {
 
     protected void sendMessagePattern(String text) throws ClientException, ApiException {
         Random random = new Random();
-        VkConfig.getVk().messages()
-                .send(VkConfig.getActor())
+        vkApiClient.messages()
+                .send(groupActor)
                 .message(text)
                 .userId(message.getFromId())
                 .randomId(random.nextInt(10000))
@@ -50,20 +60,20 @@ public abstract class ResponseMessage {
     protected void sendPicturePattern(File picture) throws ClientException, ApiException {
         Random random = new Random();
 
-        GetMessagesUploadServerResponse uploadServerResponse = VkConfig.getVk()
+        GetMessagesUploadServerResponse uploadServerResponse = vkApiClient
                 .photos()
-                .getMessagesUploadServer(VkConfig.getActor())
+                .getMessagesUploadServer(groupActor)
                 .execute();
-        MessageUploadResponse messageUploadResponse = VkConfig.getVk()
+        MessageUploadResponse messageUploadResponse = vkApiClient
                 .upload()
                 .photoMessage(uploadServerResponse.getUploadUrl().toString(), picture)
                 .execute();
 
         picture.delete();
 
-        List<SaveMessagesPhotoResponse> photoList = VkConfig.getVk()
+        List<SaveMessagesPhotoResponse> photoList = vkApiClient
                 .photos()
-                .saveMessagesPhoto(VkConfig.getActor(), messageUploadResponse.getPhoto())
+                .saveMessagesPhoto(groupActor, messageUploadResponse.getPhoto())
                 .server(messageUploadResponse.getServer())
                 .hash(messageUploadResponse.getHash())
                 .execute();
@@ -71,9 +81,9 @@ public abstract class ResponseMessage {
         SaveMessagesPhotoResponse photo = photoList.get(0);
         String attachment = "photo" + photo.getOwnerId() + "_" + photo.getId() + "_" + photo.getAccessKey();
 
-        VkConfig.getVk()
+        vkApiClient
                 .messages()
-                .send(VkConfig.getActor())
+                .send(groupActor)
                 .attachment(attachment)
                 .userId(getMessage().getFromId())
                 .randomId(random.nextInt(1000))

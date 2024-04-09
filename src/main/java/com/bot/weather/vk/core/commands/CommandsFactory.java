@@ -20,7 +20,6 @@ public class CommandsFactory {
             case USER_CITY_WEATHER -> new UserCityWeatherMessage(message);
             case UNKNOWN -> new UnknownMessage(message);
             case INFO -> new InfoMessage(message);
-            default -> throw new IllegalArgumentException("Wrong message type " + type);
         };
     }
 }

@@ -1,6 +1,5 @@
 package com.bot.weather.vk.core.dialog;
 
-import com.bot.weather.vk.global.config.VkConfig;
 import com.bot.weather.vk.core.commands.CommandsFactory;
 import com.bot.weather.vk.core.commands.messages.MessageTypes;
 import com.google.gson.annotations.SerializedName;
@@ -24,8 +23,15 @@ import java.util.Objects;
 @Slf4j
 public class Chat extends GroupLongPollApi {
 
-    public Chat(VkApiClient client, GroupActor actor, int waitTime) {
-        super(client, actor, waitTime);
+    private final VkApiClient vkApiClient;
+
+    private final GroupActor groupActor;
+
+    public Chat(VkApiClient vkApiClient, GroupActor groupActor, int waitTime) {
+        super(vkApiClient, groupActor, waitTime);
+
+        this.vkApiClient = vkApiClient;
+        this.groupActor = groupActor;
     }
 
     /**
@@ -73,12 +79,11 @@ public class Chat extends GroupLongPollApi {
     }
 
     private void logging(Message message) {
-        List<GetResponse> userInfo = null;
+        List<GetResponse> userInfo;
 
         try {
-            userInfo = VkConfig.getVk()
-                    .users()
-                    .get(VkConfig.getActor())
+            userInfo = vkApiClient.users()
+                    .get(groupActor)
                     .userIds(String.valueOf(message.getFromId()))
                     .fields(Fields.CITY)
                     .execute();

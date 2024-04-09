@@ -14,8 +14,11 @@ import java.net.http.HttpResponse;
 import java.util.Properties;
 
 public class OpenWeatherForPicture {
+
     private final String apiKey = setApiKey();
+
     private final String city;
+
     private static final double CONVERSION_COEFFICIENT = 0.75;
 
     public OpenWeatherForPicture(String city) {
