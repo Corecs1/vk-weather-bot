@@ -14,6 +14,8 @@ import com.vk.api.sdk.objects.messages.Message;
 import com.vk.api.sdk.objects.users.Fields;
 import com.vk.api.sdk.objects.users.responses.GetResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Date;
@@ -21,15 +23,18 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
+@Component
 public class Chat extends GroupLongPollApi {
 
     private final VkApiClient vkApiClient;
 
     private final GroupActor groupActor;
 
-    public Chat(VkApiClient vkApiClient, GroupActor groupActor, int waitTime) {
-        super(vkApiClient, groupActor, waitTime);
+    private static final int WAIT_TIME = 25;
 
+    @Autowired
+    public Chat(VkApiClient vkApiClient, GroupActor groupActor) {
+        super(vkApiClient, groupActor, WAIT_TIME);
         this.vkApiClient = vkApiClient;
         this.groupActor = groupActor;
     }

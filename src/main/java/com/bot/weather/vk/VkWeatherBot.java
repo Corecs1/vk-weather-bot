@@ -1,17 +1,15 @@
 package com.bot.weather.vk;
 
-import com.bot.weather.vk.global.config.VkConfig;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import(VkConfig.class)
 public class VkWeatherBot {
 
     @Value("${picture_access_token}")
@@ -19,6 +17,9 @@ public class VkWeatherBot {
 
     @Value("#{new Integer('${group_id}')}")
     private Integer groupId;
+
+    @Value("${api_version}")
+    private String API_VERSION;
 
     public static void main(String[] args) {
         SpringApplication.run(VkWeatherBot.class, args);
@@ -30,7 +31,21 @@ public class VkWeatherBot {
     }
 
     @Bean
+    @SneakyThrows
     public VkApiClient vkApiClient() {
-        return new VkApiClient(HttpTransportClient.getInstance());
+        VkApiClient vkApiClient = new VkApiClient(HttpTransportClient.getInstance());
+
+        vkApiClient.groups().setLongPollSettings(groupActor(), groupActor().getGroupId())
+                .apiVersion(API_VERSION)
+                .enabled(true)
+                .messageNew(true)
+                .photoNew(true)
+                .execute();
+
+        vkApiClient.groupsLongPoll()
+                .getLongPollServer(groupActor(), groupActor().getGroupId())
+                .execute();
+
+        return vkApiClient;
     }
 }
