@@ -4,15 +4,11 @@ import com.bot.weather.vk.core.commands.messages.*;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.messages.Message;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CommandsFactory {
-    private final Message message;
-
-    public CommandsFactory(Message message) {
-        this.message = message;
-    }
-
-    public ResponseMessage getMessage(MessageTypes type) throws ClientException, ApiException {
+    public ResponseMessage getMessage(Message message, MessageTypes type) throws ClientException, ApiException {
         return switch (type) {
             case HELLO -> new HelloMessage(message);
             case BUTTONS -> new ButtonsMessage(message);

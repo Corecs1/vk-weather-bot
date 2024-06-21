@@ -13,14 +13,16 @@ import com.vk.api.sdk.objects.callback.messages.CallbackMessage;
 import com.vk.api.sdk.objects.messages.Message;
 import com.vk.api.sdk.objects.users.Fields;
 import com.vk.api.sdk.objects.users.responses.GetResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
+import static com.bot.weather.vk.core.dialog.DialogConstant.MESSAGE_TYPES_MAP;
+import static com.bot.weather.vk.core.dialog.DialogConstant.REGEXP_TYPES_MAP;
 
 @Slf4j
 @Component
@@ -30,13 +32,20 @@ public class Chat extends GroupLongPollApi {
 
     private final GroupActor groupActor;
 
+    private final CommandsFactory commandsFactory;
+
     private static final int WAIT_TIME = 25;
 
     @Autowired
-    public Chat(VkApiClient vkApiClient, GroupActor groupActor) {
+    public Chat(VkApiClient vkApiClient, GroupActor groupActor, CommandsFactory commandsFactory) {
         super(vkApiClient, groupActor, WAIT_TIME);
         this.vkApiClient = vkApiClient;
         this.groupActor = groupActor;
+        this.commandsFactory = commandsFactory;
+    }
+
+    public CommandsFactory getCommandsFactory() {
+        return commandsFactory;
     }
 
     /**
@@ -49,38 +58,28 @@ public class Chat extends GroupLongPollApi {
             return "OK";
 
         if (message.getType() == Events.MESSAGE_NEW) {
-            try {
-                messageObjectNew(message.getGroupId(), gson.fromJson(message.getObject(), MessageObject.class));
-            } catch (ClientException | ApiException e) {
-                throw new RuntimeException(e);
-            }
+            messageObjectNew(gson.fromJson(message.getObject(), MessageObject.class));
             return "OK";
         }
 
         return super.parse(message);
     }
 
-    public void messageObjectNew(Integer groupId, MessageObject messageObject) throws ClientException, ApiException {
+    @SneakyThrows
+    public void messageObjectNew(MessageObject messageObject) {
         Message message = messageObject.getMessage();
         logging(message);
-
-        CommandsFactory commandsFactory = new CommandsFactory(message);
         String userText = message.getText().toLowerCase();
 
-        if (userText.equals("hello") || userText.equals("привет")) {
-            commandsFactory.getMessage(MessageTypes.HELLO).sendMessage();
-        } else if (userText.equals("кнопки")) {
-            commandsFactory.getMessage(MessageTypes.BUTTONS).sendMessage();
-        } else if (userText.equals("погода в моём городе")) {
-            commandsFactory.getMessage(MessageTypes.USER_CITY_WEATHER).sendMessage();
-        } else if (userText.equals("погода в другом городе")) {
-            commandsFactory.getMessage(MessageTypes.INFO).sendMessage();
-        } else if (userText.matches("погода ([а-я]|[a-z])+(\\s|-)?([а-я]|[a-z])*(\\s|-)?([а-я]|[a-z])*")) {
-            commandsFactory.getMessage(MessageTypes.CITY_WEATHER).sendMessage();
-        } else {
-            commandsFactory.getMessage(MessageTypes.UNKNOWN).sendMessage();
-        }
-//        VKConfig.setTs(config.getVk().messages().getLongPollServer(config.getActor()).execute().getTs());
+        MessageTypes messageType = Optional.ofNullable(MESSAGE_TYPES_MAP.get(userText))
+                .orElseGet(() -> REGEXP_TYPES_MAP.entrySet()
+                        .stream()
+                        .filter(map -> userText.matches(map.getKey()))
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .orElse(MessageTypes.UNKNOWN));
+
+        commandsFactory.getMessage(message, messageType).sendMessage();
     }
 
     private void logging(Message message) {
