@@ -1,16 +1,16 @@
 package com.bot.weather.vk.core.dialog;
 
-import com.bot.weather.vk.core.commands.messages.MessageTypes;
+import com.bot.weather.vk.core.commands.messages.MessageType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bot.weather.vk.core.commands.messages.MessageTypes.*;
+import static com.bot.weather.vk.core.commands.messages.MessageType.*;
 
 public class DialogConstant {
 
-    public static final Map<String, MessageTypes> MESSAGE_TYPES_MAP = new HashMap<>();
-    public static final Map<String, MessageTypes> REGEXP_TYPES_MAP = new HashMap<>();
+    public static final Map<String, MessageType> MESSAGE_TYPES_MAP = new HashMap<>();
+    public static final Map<String, MessageType> REGEXP_TYPES_MAP = new HashMap<>();
 
     static {
         MESSAGE_TYPES_MAP.put("hello", HELLO);

@@ -1,7 +1,7 @@
 package com.bot.weather.vk.core.dialog;
 
 import com.bot.weather.vk.core.commands.CommandsFactory;
-import com.bot.weather.vk.core.commands.messages.MessageTypes;
+import com.bot.weather.vk.core.commands.messages.MessageType;
 import com.google.gson.annotations.SerializedName;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
@@ -71,13 +71,13 @@ public class Chat extends GroupLongPollApi {
         logging(message);
         String userText = message.getText().toLowerCase();
 
-        MessageTypes messageType = Optional.ofNullable(MESSAGE_TYPES_MAP.get(userText))
+        MessageType messageType = Optional.ofNullable(MESSAGE_TYPES_MAP.get(userText))
                 .orElseGet(() -> REGEXP_TYPES_MAP.entrySet()
                         .stream()
                         .filter(map -> userText.matches(map.getKey()))
                         .findFirst()
                         .map(Map.Entry::getValue)
-                        .orElse(MessageTypes.UNKNOWN));
+                        .orElse(MessageType.UNKNOWN));
 
         commandsFactory.getMessage(message, messageType).sendMessage();
     }

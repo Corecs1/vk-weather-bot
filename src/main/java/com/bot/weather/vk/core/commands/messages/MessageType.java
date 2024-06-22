@@ -1,6 +1,6 @@
 package com.bot.weather.vk.core.commands.messages;
 
-public enum MessageTypes {
+public enum MessageType {
     HELLO,
     USER_CITY_WEATHER,
     CITY_WEATHER,
