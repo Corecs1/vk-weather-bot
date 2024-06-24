@@ -1,11 +1,13 @@
 package com.bot.weather.vk.core.commands.keyboards;
 
 import com.vk.api.sdk.objects.messages.*;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class GeneralMenu implements Menu {
 
     private final Keyboard keyboard = new Keyboard();
@@ -41,6 +43,7 @@ public class GeneralMenu implements Menu {
         keyboard.setButtons(allKey);
     }
 
+    /** @noinspection SameParameterValue*/
     private KeyboardButton createButton(String label, TemplateActionTypeNames type, KeyboardButtonColor color) {
         return new KeyboardButton()
                 .setAction(new KeyboardButtonAction().setLabel(label).setType(type))

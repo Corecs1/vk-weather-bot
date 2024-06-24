@@ -1,6 +1,5 @@
 package com.bot.weather.vk.core.commands.messages;
 
-import com.bot.weather.vk.core.commands.keyboards.GeneralMenu;
 import com.bot.weather.vk.core.commands.keyboards.Menu;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
@@ -16,9 +15,12 @@ import java.util.Random;
 @Scope("prototype")
 public class ButtonsMessage extends ResponseMessage {
 
+    private final Menu menu;
+
     @Autowired
-    public ButtonsMessage(VkApiClient vkApiClient, GroupActor groupActor) {
+    public ButtonsMessage(VkApiClient vkApiClient, GroupActor groupActor, Menu menu) {
         super(vkApiClient, groupActor);
+        this.menu = menu;
     }
 
     @Override
@@ -28,7 +30,6 @@ public class ButtonsMessage extends ResponseMessage {
     }
 
     private void sendMenu() throws ApiException, ClientException {
-        Menu menu = new GeneralMenu();
         Random random = new Random();
         vkApiClient.messages()
                 .send(groupActor)
