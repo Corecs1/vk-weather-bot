@@ -1,7 +1,7 @@
 package com.bot.weather.vk.core.commands.messages;
 
 import com.bot.weather.vk.core.FilePath;
-import com.bot.weather.vk.core.weather.parser.OpenWeatherForPicture;
+import com.bot.weather.vk.core.weather.parser.WeatherService;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
@@ -16,9 +16,12 @@ import java.io.File;
 @Scope("prototype")
 public class UserCityWeatherMessage extends ResponseMessage {
 
+    private final WeatherService weatherService;
+
     @Autowired
-    public UserCityWeatherMessage(VkApiClient vkApiClient, GroupActor groupActor) {
+    public UserCityWeatherMessage(VkApiClient vkApiClient, GroupActor groupActor, WeatherService weatherService) {
         super(vkApiClient, groupActor);
+        this.weatherService = weatherService;
     }
 
     @Override
@@ -29,8 +32,7 @@ public class UserCityWeatherMessage extends ResponseMessage {
         if (userCity.equals("null")) {
             sendMessagePattern("К сожалению информация о городе скрыта в твоём профиле");
         } else {
-            OpenWeatherForPicture openWeather = new OpenWeatherForPicture(getUserInfo().get(0).getCity().getTitle());
-            openWeather.getWeather();
+            weatherService.createWeatherPicture(getUserInfo().get(0).getCity().getTitle());
             File picture = new File(FilePath.weatherCascade);
             sendPicturePattern(picture);
         }
