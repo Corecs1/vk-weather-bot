@@ -44,10 +44,6 @@ public class Chat extends GroupLongPollApi {
         this.commandsFactory = commandsFactory;
     }
 
-    public CommandsFactory getCommandsFactory() {
-        return commandsFactory;
-    }
-
     /**
      * Переопределён метод, чтобы сделать прослойку с кастосмным {@link MessageObject}.
      * Необходимо для решения <a href="https://github.com/VKCOM/vk-java-sdk/issues/246">проблемы</a> в коробке.
@@ -79,7 +75,7 @@ public class Chat extends GroupLongPollApi {
                         .map(Map.Entry::getValue)
                         .orElse(MessageType.UNKNOWN));
 
-        commandsFactory.getMessage(message, messageType).sendMessage();
+        commandsFactory.getMessage(messageType).sendMessage(message);
     }
 
     private void logging(Message message) {

@@ -5,28 +5,32 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.objects.messages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
 @Component
-@Scope("prototype")
-public class ButtonsMessage extends ResponseMessage {
+public class ButtonsResponseMessage extends AbstractResponseMessage {
 
     private final Menu menu;
 
     @Autowired
-    public ButtonsMessage(VkApiClient vkApiClient, GroupActor groupActor, Menu menu) {
+    public ButtonsResponseMessage(VkApiClient vkApiClient, GroupActor groupActor, Menu menu) {
         super(vkApiClient, groupActor);
         this.menu = menu;
     }
 
     @Override
-    public void sendMessage() throws ClientException, ApiException {
-        super.sendMessage();
+    public void sendMessage(Message incomeMessage) throws ClientException, ApiException {
+        super.sendMessage(incomeMessage);
         sendMenu();
+    }
+
+    @Override
+    public MessageType getType() {
+        return MessageType.BUTTONS;
     }
 
     private void sendMenu() throws ApiException, ClientException {

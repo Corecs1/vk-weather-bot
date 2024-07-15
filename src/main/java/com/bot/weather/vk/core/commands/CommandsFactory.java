@@ -1,48 +1,28 @@
 package com.bot.weather.vk.core.commands;
 
-import com.bot.weather.vk.core.commands.messages.*;
-import com.vk.api.sdk.objects.messages.Message;
-import jakarta.annotation.PostConstruct;
+import com.bot.weather.vk.core.commands.messages.MessageType;
+import com.bot.weather.vk.core.commands.messages.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
-import static com.bot.weather.vk.core.commands.messages.MessageType.*;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class CommandsFactory {
 
-    private final Supplier<List<ResponseMessage>> responseMessagesSupplier;
-
-    private final Map<MessageType, Class<? extends ResponseMessage>> TYPES_CLASS_MAP = new HashMap<>();
+    private final Map<MessageType, ResponseMessage> messageMap;
 
     @Autowired
-    public CommandsFactory(Supplier<List<ResponseMessage>> responseMessagesSupplier) {
-        this.responseMessagesSupplier = responseMessagesSupplier;
+    public CommandsFactory(List<ResponseMessage> messages) {
+        messageMap = messages.stream()
+                .collect(toMap(ResponseMessage::getType, Function.identity()));
     }
 
-    @PostConstruct
-    private void initTypesClassMap() {
-        TYPES_CLASS_MAP.put(HELLO, HelloMessage.class);
-        TYPES_CLASS_MAP.put(BUTTONS, ButtonsMessage.class);
-        TYPES_CLASS_MAP.put(CITY_WEATHER, CityWeatherMessage.class);
-        TYPES_CLASS_MAP.put(USER_CITY_WEATHER, UserCityWeatherMessage.class);
-        TYPES_CLASS_MAP.put(UNKNOWN, UnknownMessage.class);
-        TYPES_CLASS_MAP.put(INFO, InfoMessage.class);
-    }
-
-    public ResponseMessage getMessage(Message message, MessageType type) {
-        return responseMessagesSupplier.get()
-                .stream()
-                .filter(rm -> rm.getClass() == TYPES_CLASS_MAP.get(type))
-                .findFirst()
-                .map(responseMessage -> {
-                    responseMessage.setMessage(message);
-                    return responseMessage;
-                }).orElse(null);
+    public ResponseMessage getMessage(MessageType type) {
+        return messageMap.get(type);
     }
 }

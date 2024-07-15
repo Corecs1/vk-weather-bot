@@ -43,7 +43,9 @@ public class GeneralMenu implements Menu {
         keyboard.setButtons(allKey);
     }
 
-    /** @noinspection SameParameterValue*/
+    /**
+     * @noinspection SameParameterValue
+     */
     private KeyboardButton createButton(String label, TemplateActionTypeNames type, KeyboardButtonColor color) {
         return new KeyboardButton()
                 .setAction(new KeyboardButtonAction().setLabel(label).setType(type))

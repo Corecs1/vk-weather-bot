@@ -1,8 +1,5 @@
 package com.bot.weather.vk;
 
-import com.bot.weather.vk.core.commands.ResponseMessagesList;
-import com.bot.weather.vk.core.commands.messages.ResponseMessage;
-import com.bot.weather.vk.global.config.SpringContext;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
@@ -11,9 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 @SpringBootApplication
 public class VkWeatherBot {
@@ -53,10 +47,5 @@ public class VkWeatherBot {
                 .execute();
 
         return vkApiClient;
-    }
-
-    @Bean
-    public Supplier<List<ResponseMessage>> responseMessagesSupplier() {
-        return () -> SpringContext.getBean(ResponseMessagesList.class).getResponseMessages();
     }
 }

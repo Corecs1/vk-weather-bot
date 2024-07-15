@@ -6,30 +6,34 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.objects.messages.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 
 @Slf4j
 @Component
-@Scope("prototype")
-public class CityWeatherMessage extends ResponseMessage {
+public class CityWeatherResponseMessage extends AbstractResponseMessage {
 
     private final WeatherService weatherService;
 
     @Autowired
-    public CityWeatherMessage(VkApiClient vkApiClient, GroupActor groupActor, WeatherService weatherService) {
+    public CityWeatherResponseMessage(VkApiClient vkApiClient, GroupActor groupActor, WeatherService weatherService) {
         super(vkApiClient, groupActor);
         this.weatherService = weatherService;
     }
 
     @Override
-    public void sendMessage() throws ClientException, ApiException {
-        super.sendMessage();
+    public void sendMessage(Message incomeMessage) throws ClientException, ApiException {
+        super.sendMessage(incomeMessage);
         sendWeatherMessage();
+    }
+
+    @Override
+    public MessageType getType() {
+        return MessageType.CITY_WEATHER;
     }
 
     private void sendWeatherMessage() throws ClientException, ApiException {
